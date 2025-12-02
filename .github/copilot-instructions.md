@@ -1,51 +1,30 @@
-## Quick context (what this project is)
+System: # Role and Objective
+You are an advanced AI model tasked with solving complex programming problems by employing structured and sophisticated reasoning methods. Your mission is to provide technically precise, secure, efficient, and well-documented code solutions that thoroughly adhere to project requirements.
 
-Bridgit AI is a Next.js (app-router) TypeScript + Tailwind UI dashboard and component playground.
-It uses the App Router and a mix of server components and client components (many UI components include a "use client" directive).
+# Instructions
+- Break down each programming task using Chain of Thought (CoT) reasoning, decomposing it into logical, modular components. Clearly outline dependencies and ensure that the system design is coherent and maintainable. Verify correctness before proceeding to subsequent steps.
+- Apply Step-by-Step Rationalization (STaR) to justify coding decisions using clear, concise comments or documentation, describing alternatives or rationale only where it aids code maintainability or is explicitly requested.
+- Use A* Search principles to optimize for both code efficiency (time, space, and resource management) and reliability. Select algorithms and data structures pragmatically, profile for performance bottlenecks, and rigorously test—including edge cases.
+- Employ Tree of Thoughts (ToT) methodology to systematically explore and evaluate multiple coding solutions. When applicable, document why specific options were chosen or rejected, focusing on technical clarity and future maintainability.
+- Simulate adaptive learning by reflecting on your coding decisions within documentation or review contexts. Limit summaries of takeaways and improvements to explicit documentation or review instructions.
+- Continuously monitor progress, reviewing the codebase for maintainability, technical debt, and alignment with project goals. Refactor and optimize as necessary, using real-time feedback, but avoid unsolicited process commentary or output.
+- Enforce security best practices at all times, including input validation, encryption, and coding against known vulnerabilities. Code should be robust against prevalent security threats.
+- Prioritize code readability with clear variable naming, consistent formatting, and logical organization to simplify maintenance and collaboration.
+- Focus your documentation and code comments on technical clarity and team standards, ensuring accessibility for all contributors. Do not include personal reflections unless explicitly requested.
 
-Core areas an AI agent should know immediately:
+# Project Constraints
+- NO BULLSHIT. NO GAMES. NO GOOFING AROUND. NO WASTING TIME.
+- NO CUSTOM COMPONENTS. NO CUSTOM HTML. NO UNAPPROVED COMPONENTS.
+- If you detect any UI components outside the SHADCN library, report it immediately. ONLY USE SHADCN COMPONENTS. This is for a custom SHADCN UI component registry. Do NOT use anything else.
 
-- app/ — top-level app router pages (server components) and route handlers
-- components/ — UI building blocks are split into `components/ui/` (shadcn-style UI primitives) and `components/ai-elements/` (interactive AI UIs)
-- lib/search/ — Upstash-based search index, plus a seed script at `lib/search/seed.ts`
-- public/data/ — static component catalogs (e.g. `components-catalog.json` and `widget-bridgit.json`)
-- app/api/search/components — a server route powered by `lib/search/components-search.ts`
+# Tool Usage
+- Always utilize your MCP TOOLS: CONTEXT7, SEARCH, and MEMORY.
+- Take internal notes for performance and self-improvement but do NOT output internal thoughts unless explicitly requested.
 
-Important developer commands (from `package.json`):
+# Output Format and Verbosity
+- Deliver solutions, answers, or reviews in a structured, clear, and concise manner.
+- Use markdown where appropriate and technical formatting and inline code for file, function, class, or API names.
+- Limit responses to a maximum of 2 concise paragraphs or, if listing, at most 6 short bullets. Prioritize complete, actionable answers within this length cap.
 
-- pnpm dev — run local dev server (Next.js with turbopack: `next dev --turbopack`).
-- pnpm build — builds with turbopack (`next build --turbopack`).
-- pnpm start — production serve (`next start`).
-- pnpm lint — runs ESLint.
-
-Environment & integrations to be aware of
-
-- Upstash Search is used for component search. See `lib/search/components-search.ts`.
-  Required env vars (check `.env.example`):
-  - NEXT_PUBLIC_UPSTASH_SEARCH_REST_URL
-  - UPSTASH_SEARCH_REST_TOKEN
-  - UPSTASH_SEARCH_REST_READONLY_TOKEN (readonly token exists in repo `.env` — treat as secret)
-
-- GROQ_API_KEY appears in `.env` and `.env.example` (Sanity/GROQ SDK is installed). The app also supports multiple model/provider options via the UI (see `components/ai-elements/model-selector.tsx`).
-
-Key patterns & conventions (concrete, discoverable)
-
-- File/Export naming: UI primitives live in `components/ui/` and export PascalCase components (e.g. `components/ui/button.tsx` -> `Button`). Look at `lib/search/seed.ts` for how metadata expects `file` and `exports` fields.
-- Client vs server components: Many components in `components/ai-elements/` and `components/ui/` start with `"use client"` — handle hydration boundaries and event handlers accordingly.
-- Search/AI flow: frontend calls `GET /api/search/components?q=...` which routes to `app/api/search/components/route.ts` and then into `lib/search/components-search.ts` (reranking / semantic / full-text modes).
-- Public data is authoritative for the catalog: `public/data/components-catalog.json` and `public/data/widget-bridgit.json` are used as sample data / seeds and should be kept in sync with component metadata.
-
-Notes for AI coding agents (concrete instructions)
-
-- If making fixes or features, prefer editing the files in `components/` and `lib/` and add/update matching entries in `public/data/` and `lib/search/seed.ts` so the local seed & UI remain consistent.
-- When adding a new component, make sure the `file` path and `exports` match (e.g. `/components/ui/mycomp.tsx` and exported symbol `MyComp`) and add metadata to `public/data` and the `seed.ts` catalog if search-updates are needed.
-- For search or model work, use the `lib/search/*` helpers — they rely on env vars and `@upstash/search`.
-
-Minimal runnable notes (what I found in the repo):
-
-- No explicit seed script is declared in package.json — `lib/search/seed.ts` contains a `seedComponents()` function and can be executed with a TS runtime (ts-node) or compiled to run with node. The seed expects the Upstash env vars.
-- No test scripts were found in package.json. There are testing-related deps in the lockfile (e.g. Playwright) but no formal test runner configured in package.json.
-
-Do not assume anything not in source control: call out missing steps (seed execution, test runner) in PR descriptions and add small developer scripts where appropriate.
-
-If you'd like I can merge this into a different place, add an explicit `pnpm seed` script, or expand these guidelines into a fuller AGENT.md describing how to run environment-specific tasks locally (example: how to run the seed with ts-node). Please tell me which you prefer.
+# Final Guideline
+By rigorously following these principles and workflow, you will consistently generate code that is secure, logical, efficient, well-structured, and suitable for collaborative development.

@@ -1,4 +1,5 @@
 import { Search } from "@upstash/search";
+import { UPSTASH_CONFIG } from "../upstash-config";
 
 // Component content type
 export type ComponentContent = {
@@ -18,10 +19,7 @@ export type ComponentMetadata = {
 };
 
 // Initialize Search client
-const client = new Search({
-  url: process.env.NEXT_PUBLIC_UPSTASH_SEARCH_REST_URL,
-  token: process.env.UPSTASH_SEARCH_REST_TOKEN,
-});
+const client = new Search(UPSTASH_CONFIG);
 
 // Create or access the components index
 const componentIndex = client.index<ComponentContent, ComponentMetadata>("components");
@@ -183,7 +181,7 @@ export async function deleteComponents(ids: string[]) {
 }
 
 // Range search (pagination)
-export async function rangeSearchComponents(cursor: number = 0, limit: number = 10) {
+export async function rangeSearchComponents(cursor: string = "0", limit: number = 10) {
   try {
     const { nextCursor, documents } = await componentIndex.range({
       cursor,
@@ -218,4 +216,12 @@ export async function resetComponentIndex() {
   }
 }
 
-export default componentIndex;
+export async function getAllComponents() {
+  try {
+    const results = await componentIndex.range({ cursor: "0", limit: 1000 });
+    return results.documents;
+  } catch (error) {
+    console.error("Error getting all components:", error);
+    return [];
+  }
+}

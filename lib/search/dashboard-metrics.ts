@@ -7,17 +7,16 @@ export type DashboardMetrics = {
   cost: number | null
 }
 
-function findNumber(obj: any, keys: string[]): number | null {
+function findNumber(obj: unknown, keys: string[]): number | null {
   if (!obj || typeof obj !== "object") return null
-  for (const k of Object.keys(obj)) {
+  for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
     const lower = k.toLowerCase()
-    if (keys.some((needle) => lower.includes(needle))) {
-      const val = obj[k]
-      if (typeof val === "number") return val
-      if (typeof val === "string" && !isNaN(Number(val))) return Number(val)
+    if (keys.some((needle) => lower.includes(needle.toLowerCase()))) {
+      if (typeof v === "number") return v
+      if (typeof v === "string" && !isNaN(Number(v))) return Number(v)
     }
-    if (typeof obj[k] === "object") {
-      const nested: number | null = findNumber(obj[k], keys)
+    if (v && typeof v === "object") {
+      const nested: number | null = findNumber(v, keys)
       if (nested !== null) return nested
     }
   }
@@ -31,22 +30,27 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
   let cost: number | null = null
 
   try {
-    const info: any = await getComponentIndexInfo()
+    const info: unknown = await getComponentIndexInfo()
+    console.log("Dashboard metrics info:", info)
 
-    documents = findNumber(info, ["documents", "docs", "documentcount", "document_count", "count"]) ?? null
+    documents = findNumber(info, ["documents", "docs", "documentcount", "document_count", "count", "documentCount"]) ?? null
     requests = findNumber(info, ["requests", "request_count", "reqs", "requests_count"]) ?? null
-    storageBytes = findNumber(info, ["bytes", "total_bytes", "size", "disk", "storage_bytes"]) ?? null
+    storageBytes = findNumber(info, ["bytes", "total_bytes", "size", "disk", "storage_bytes", "diskSize"]) ?? null
     cost = findNumber(info, ["cost", "billing", "price", "charges"]) ?? null
 
     // Some Upstash responses expose per-index objects; try those too
     if (documents === null) {
-      if (info?.indexes) {
-        documents = findNumber(info.indexes, ["documents", "docs", "documentcount", "count"]) ?? documents
-      } else if (info?.namespaces) {
-        documents = findNumber(info.namespaces, ["documents", "docs", "documentcount", "count"]) ?? documents
+      const maybeInfo = info as { indexes?: unknown; namespaces?: unknown } | null | undefined
+      if (maybeInfo?.indexes) {
+        documents = findNumber(maybeInfo.indexes, ["documents", "docs", "documentcount", "count", "documentCount"]) ?? documents
+      } else if (maybeInfo?.namespaces) {
+        documents = findNumber(maybeInfo.namespaces, ["documents", "docs", "documentcount", "count", "documentCount"]) ?? documents
       }
     }
-  } catch (e) {
+
+    console.log("Extracted metrics:", { documents, requests, storageBytes, cost })
+  } catch (error) {
+    console.error("Error getting dashboard metrics:", error)
     // Silent fallback - metrics will be null
   }
 
