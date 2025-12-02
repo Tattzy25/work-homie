@@ -140,6 +140,11 @@ const data = {
       icon: IconSettings,
     },
     {
+      title: "AI Elements",
+      url: "/aielements",
+      icon: IconFileAi,
+    },
+    {
       title: "Get Help",
       url: "#",
       icon: IconHelp,
