@@ -143,9 +143,11 @@ npm run build
 # Linting passes with warnings before type checking
 
 # WORKAROUND: To fix the build error, change in app/api/search/route.ts:
-# Line 12: const results = await componentIndex.query({ ... })
+# Line 12: const results = await componentIndex.query({ query, topK: 20 })
 # To: const results = await componentIndex.search({ query, limit: 20 })
-# See lib/search/components-search.ts for correct search API usage
+# Note: The method name changes from .query() to .search()
+# And the parameter changes from topK to limit
+# See lib/search/components-search.ts for correct search API usage examples
 ```
 
 ### Production Server
