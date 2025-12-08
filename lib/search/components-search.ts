@@ -18,11 +18,39 @@ export type ComponentMetadata = {
   difficulty: "easy" | "medium" | "hard";
 };
 
-// Initialize Search client
-const client = new Search(UPSTASH_CONFIG);
+// Lazy initialization of Search client
+let client: Search | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let componentIndexInstance: any = null;
 
-// Create or access the components index
-export const componentIndex = client.index<ComponentContent, ComponentMetadata>("components");
+function getClient() {
+  if (!client) {
+    // Only initialize if environment variables are available
+    if (!UPSTASH_CONFIG.url || !UPSTASH_CONFIG.token) {
+      throw new Error("Upstash configuration is missing. Please set UPSTASH_SEARCH_REST_URL and UPSTASH_SEARCH_REST_TOKEN environment variables.");
+    }
+    client = new Search(UPSTASH_CONFIG);
+  }
+  return client;
+}
+
+function getComponentIndex() {
+  if (!componentIndexInstance) {
+    componentIndexInstance = getClient().index<ComponentContent, ComponentMetadata>("components");
+  }
+  return componentIndexInstance;
+}
+
+// Create or access the components index with lazy initialization
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const componentIndex = new Proxy({} as any, {
+  get(target, prop) {
+    const index = getComponentIndex();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const value = (index as any)[prop];
+    return typeof value === 'function' ? value.bind(index) : value;
+  }
+});
 
 // Upsert components into the index
 export async function upsertComponents(
@@ -197,7 +225,7 @@ export async function rangeSearchComponents(cursor: string = "0", limit: number 
 // Get index info and namespace statistics
 export async function getComponentIndexInfo() {
   try {
-    const info = await client.info();
+    const info = await getClient().info();
     return info;
   } catch (error) {
     console.error("Error getting index info:", error);

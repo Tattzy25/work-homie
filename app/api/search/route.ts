@@ -9,9 +9,9 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const results = await componentIndex.query({
+    const results = await componentIndex.search({
       query,
-      topK: 20,
+      limit: 20,
     })
     return Response.json(results)
   } catch (error) {
