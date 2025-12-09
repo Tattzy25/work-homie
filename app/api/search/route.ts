@@ -1,6 +1,26 @@
 import { NextRequest } from 'next/server'
 import { componentIndex } from '../../../lib/search/components-search'
 
+/**
+ * ⚠️ CRITICAL - DO NOT MODIFY WITHOUT UNDERSTANDING UPSTASH SEARCH API ⚠️
+ * 
+ * This endpoint uses @upstash/search (NOT @upstash/vector).
+ * 
+ * CORRECT API METHOD FOR @upstash/search:
+ * ✅ componentIndex.search({ query: string, limit: number })
+ * 
+ * INCORRECT (DO NOT USE):
+ * ❌ componentIndex.query({ query: string, topK: number })
+ * 
+ * The .query() method with topK parameter is for @upstash/vector (different package).
+ * Using .query() will cause TypeScript compilation errors and build failures.
+ * 
+ * @upstash/search uses:
+ * - .search() method with "limit" parameter
+ * - Other available methods: upsert, fetch, range, delete, reset, info
+ * 
+ * See official docs: https://upstash.com/docs/search/sdks/ts/commands/search
+ */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const query = searchParams.get('q')
@@ -9,9 +29,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const results = await componentIndex.query({
+    // ⚠️ DO NOT CHANGE: Use .search() with "limit", NOT .query() with "topK"
+    const results = await componentIndex.search({
       query,
-      topK: 20,
+      limit: 20,
     })
     return Response.json(results)
   } catch (error) {
