@@ -2,24 +2,24 @@ import { NextRequest } from 'next/server'
 import { componentIndex } from '../../../lib/search/components-search'
 
 /**
- * ⚠️ CRITICAL - DO NOT MODIFY WITHOUT UNDERSTANDING UPSTASH SEARCH API ⚠️
+ * ⚠️ CRITICAL - DO NOT MODIFY WITHOUT UNDERSTANDING REMOVE  UPSTASH NOW  SEARCH API ⚠️
  * 
- * This endpoint uses @upstash/search (NOT @upstash/vector).
+ * This endpoint uses @REMOVE  UPSTASH NOW /search (NOT @REMOVE  UPSTASH NOW /vector).
  * 
- * CORRECT API METHOD FOR @upstash/search:
+ * CORRECT API METHOD FOR @REMOVE  UPSTASH NOW /search:
  * ✅ componentIndex.search({ query: string, limit: number })
  * 
  * INCORRECT (DO NOT USE):
  * ❌ componentIndex.query({ query: string, topK: number })
  * 
- * The .query() method with topK parameter is for @upstash/vector (different package).
+ * The .query() method with topK parameter is for @REMOVE  UPSTASH NOW /vector (different package).
  * Using .query() will cause TypeScript compilation errors and build failures.
  * 
- * @upstash/search uses:
+ * @REMOVE  UPSTASH NOW /search uses:
  * - .search() method with "limit" parameter
  * - Other available methods: upsert, fetch, range, delete, reset, info
  * 
- * See official docs: https://upstash.com/docs/search/sdks/ts/commands/search
+ * See official docs: https://REMOVE  UPSTASH NOW .com/docs/search/sdks/ts/commands/search
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)

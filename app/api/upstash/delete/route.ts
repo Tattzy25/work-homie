@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { UPSTASH_CONFIG } from '../../../../lib/upstash-config'
+import { REMOVE  UPSTASH NOW _CONFIG } from '../../../../lib/REMOVE  UPSTASH NOW -config'
 
 export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -7,10 +7,10 @@ export async function DELETE(request: NextRequest) {
   if (!id) {
     return Response.json({ error: 'id required' }, { status: 400 })
   }
-  const res = await fetch(`https://api.upstash.com/v2/search/${id}`, {
+  const res = await fetch(`https://api.REMOVE  UPSTASH NOW .com/v2/search/${id}`, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${UPSTASH_CONFIG.token}`,
+      'Authorization': `Bearer ${REMOVE  UPSTASH NOW _CONFIG.token}`,
     },
   })
   if (!res.ok) {

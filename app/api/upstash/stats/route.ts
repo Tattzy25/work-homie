@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server'
-import { UPSTASH_CONFIG } from '../../../../lib/upstash-config'
+import { REMOVE  UPSTASH NOW _CONFIG } from '../../../../lib/REMOVE  UPSTASH NOW -config'
 
 export async function GET() {
-  const res = await fetch('https://api.upstash.com/v2/search/stats', {
+  const res = await fetch('https://api.REMOVE  UPSTASH NOW .com/v2/search/stats', {
     headers: {
-      'Authorization': `Bearer ${UPSTASH_CONFIG.token}`,
+      'Authorization': `Bearer ${REMOVE  UPSTASH NOW _CONFIG.token}`,
     },
   })
   if (!res.ok) {
