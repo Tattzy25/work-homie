@@ -1,535 +1,487 @@
 "use client"
 
-import { useState, useMemo, useCallback } from "react"
-import { useBoolean, useToggle, useMount, useUnmount, useUpdateEffect, useEventListener, useInterval } from "ahooks"
-import { CalendarView } from "./calendar-view"
-import { ListView } from "./list-view"
-import { CalendarAnalytics } from "./calendar-analytics"
-import { CalendarNavigation } from "./calendar-navigation"
-import { VideoUpload } from "./video-upload"
-import { VideoForm } from "./video-form"
+import { useState } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus } from "lucide-react"
-import { format, isSameDay, startOfMonth, endOfMonth, addMonths, subMonths } from "date-fns"
-import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Calendar,
+  Plus,
+  Clock,
+  TrendingUp,
+  Zap,
+  Target,
+  BarChart3,
+  Edit,
+  Trash2,
+  Play,
+  CheckCircle,
+  Circle,
+  Sparkles,
+  Camera,
+  Hash
+} from "lucide-react"
+import { format, addDays, addMonths, subMonths, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isToday, isPast } from "date-fns"
 
-interface TikTokVideo {
+interface ContentPost {
   id: string
   title: string
-  description: string
-  videoFile?: File
-  videoUrl?: string
-  thumbnailUrl?: string
-  duration: number
-  trend: string
+  caption: string
   hashtags: string[]
-  optimalTime: string
   scheduledDate: Date
-  expectedEngagement: number
+  scheduledTime: string
   status: 'draft' | 'scheduled' | 'posted'
-  uploadProgress?: number
+  platform: 'tiktok' | 'instagram' | 'twitter'
+  thumbnail?: string
+  viralScore: number
 }
 
-interface PostFormData {
-  title: string
-  description: string
-  trend: string
-  hashtags: string
-  optimalTime: string
-  scheduledDate: Date
-}
-
-// Mock data for existing videos
-const MOCK_VIDEOS: TikTokVideo[] = [
+const MOCK_POSTS: ContentPost[] = [
   {
     id: "1",
-    title: "AI Dance Challenge",
-    description: "Showcasing the latest AI-powered dance moves",
-    videoUrl: "/videos/dance-challenge.mp4",
-    thumbnailUrl: "/thumbnails/dance.jpg",
-    duration: 15,
-    trend: "#DanceChallenge2026",
-    hashtags: ["#DanceChallenge2026", "#AI", "#Viral"],
-    optimalTime: "18:00",
+    title: "Morning Dance Routine 💃",
+    caption: "POV: You wake up and choose violence 💥 Starting my day with moves that hit different! What's your go-to morning motivation? 🌅",
+    hashtags: ["#DanceTok", "#MorningVibes", "#ViralDance"],
     scheduledDate: new Date(),
-    expectedEngagement: 85,
-    status: 'scheduled'
+    scheduledTime: "07:00",
+    status: 'scheduled',
+    platform: 'tiktok',
+    viralScore: 87
   },
   {
     id: "2",
-    title: "Sustainable Fashion Haul",
-    description: "Eco-friendly fashion finds under $50",
-    videoUrl: "/videos/fashion-haul.mp4",
-    thumbnailUrl: "/thumbnails/fashion.jpg",
-    duration: 30,
-    trend: "#SustainableLiving",
+    title: "Sustainable Fashion Haul 🛍️",
+    caption: "Eco-friendly finds under $50 that actually SLAY 💅 Who knew being sustainable could look this good?",
     hashtags: ["#SustainableLiving", "#EcoFashion", "#BudgetFriendly"],
-    optimalTime: "15:00",
-    scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-    expectedEngagement: 72,
-    status: 'draft'
+    scheduledDate: addDays(new Date(), 1),
+    scheduledTime: "15:00",
+    status: 'draft',
+    platform: 'instagram',
+    viralScore: 92
+  },
+  {
+    id: "3",
+    title: "AI Dance Challenge 🤖",
+    caption: "When AI meets dance moves... the future is now! 🔥 Tag a friend who needs this in their life",
+    hashtags: ["#DanceChallenge2026", "#AI", "#Viral"],
+    scheduledDate: addDays(new Date(), 2),
+    scheduledTime: "18:00",
+    status: 'scheduled',
+    platform: 'tiktok',
+    viralScore: 94
   }
 ]
 
-type ViewMode = 'calendar' | 'list'
-
 export function ViralCalendar() {
-  // Advanced hooks from ahooks
-  const [loading, { setTrue: setLoading, setFalse: setNotLoading }] = useBoolean(false)
-  const [viewMode, { toggle: toggleViewMode, set: setViewMode }] = useToggle<ViewMode>('calendar')
-  const [autoSaveEnabled] = useBoolean(true)
-
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [videos, setVideos] = useState<TikTokVideo[]>(MOCK_VIDEOS)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [editingVideo, setEditingVideo] = useState<TikTokVideo | null>(null)
-  const [formData, setFormData] = useState<PostFormData>({
+  const [posts, setPosts] = useState<ContentPost[]>(MOCK_POSTS)
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [viewMode, setViewMode] = useState<'month' | 'week'>('month')
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingPost, setEditingPost] = useState<ContentPost | null>(null)
+  const [newPost, setNewPost] = useState({
     title: "",
-    description: "",
-    trend: "",
+    caption: "",
     hashtags: "",
-    optimalTime: "6:00 PM",
-    scheduledDate: new Date()
-  })
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
-
-  // Lifecycle hooks
-  useMount(() => {
-    console.log('🗓️ Viral Calendar mounted!')
-    // Load saved calendar data from localStorage
-    const saved = localStorage.getItem('viral-calendar-videos')
-    if (saved) {
-      try {
-        const parsedVideos = JSON.parse(saved).map((video: any) => ({
-          ...video,
-          scheduledDate: new Date(video.scheduledDate)
-        }))
-        setVideos(parsedVideos)
-      } catch (error) {
-        console.warn('Failed to load saved calendar data')
-      }
-    }
+    scheduledTime: "18:00",
+    platform: "tiktok" as 'tiktok' | 'instagram' | 'twitter'
   })
 
-  useUnmount(() => {
-    console.log('📅 Viral Calendar unmounting...')
-  })
+  // Calculate view dates based on mode
+  const monthStart = startOfMonth(selectedDate)
+  const monthEnd = endOfMonth(selectedDate)
+  const weekStart = startOfWeek(selectedDate, { weekStartsOn: 1 })
+  const weekEnd = endOfWeek(selectedDate, { weekStartsOn: 1 })
 
-  // Auto-save videos to localStorage when they change
-  useUpdateEffect(() => {
-    if (autoSaveEnabled) {
-      localStorage.setItem('viral-calendar-videos', JSON.stringify(videos))
-      console.log('💾 Auto-saved calendar data')
-    }
-  }, [videos])
+  const currentViewStart = viewMode === 'month' ? monthStart : weekStart
+  const currentViewEnd = viewMode === 'month' ? monthEnd : weekEnd
 
-  // Keyboard navigation
-  useEventListener('keydown', (event: KeyboardEvent) => {
-    if (isDialogOpen) return // Don't interfere with form inputs
+  // Generate days for current view
+  const viewDays = viewMode === 'month'
+    ? eachDayOfInterval({ start: monthStart, end: monthEnd })
+    : eachDayOfInterval({ start: weekStart, end: weekEnd })
 
-    switch (event.key) {
-      case 'ArrowLeft':
-        event.preventDefault()
-        navigatePrevious()
-        break
-      case 'ArrowRight':
-        event.preventDefault()
-        navigateNext()
-        break
-      case 'Home':
-        event.preventDefault()
-        navigateToday()
-        break
-      case 't':
-        if (event.ctrlKey || event.metaKey) {
-          event.preventDefault()
-          toggleViewMode()
-        }
-        break
-    }
-  })
+  const postsForView = posts.filter(post =>
+    post.scheduledDate >= currentViewStart && post.scheduledDate <= currentViewEnd
+  )
 
-  // Auto-refresh trends every 5 minutes
-  useInterval(() => {
-    if (!loading) {
-      console.log('🔄 Refreshing calendar trends...')
-      // In a real app, this would fetch latest TikTok trends
-    }
-  }, 300000) // 5 minutes
+  const handleCreatePost = () => {
+    if (!newPost.title.trim() || !newPost.caption.trim()) return
 
-  // Computed values
-  const currentViewVideos = useMemo(() => {
-    const monthStart = startOfMonth(currentDate)
-    const monthEnd = endOfMonth(currentDate)
-    return videos.filter(video =>
-      video.scheduledDate >= monthStart && video.scheduledDate <= monthEnd
-    )
-  }, [videos, currentDate])
-
-  const analyticsData = useMemo(() => ({
-    totalVideos: videos.length,
-    scheduledVideos: videos.filter(v => v.status === 'scheduled').length,
-    avgEngagement: 78,
-    bestTime: "6-8 PM"
-  }), [videos])
-
-  // Navigation functions
-  const navigatePrevious = useCallback(() => {
-    setCurrentDate(prev => subMonths(prev, 1))
-  }, [])
-
-  const navigateNext = useCallback(() => {
-    setCurrentDate(prev => addMonths(prev, 1))
-  }, [])
-
-  const navigateToday = useCallback(() => {
-    setCurrentDate(new Date())
-  }, [])
-
-  // Form validation
-  const validateForm = useCallback(() => {
-    console.log('🔍 Validating form...', { formData, selectedDate, viewMode })
-
-    if (!formData.title.trim()) {
-      toast.error("Video title is required")
-      return false
+    const post: ContentPost = {
+      id: crypto.randomUUID(),
+      title: newPost.title,
+      caption: newPost.caption,
+      hashtags: newPost.hashtags.split(',').map(tag => tag.trim()).filter(Boolean),
+      scheduledDate: selectedDate,
+      scheduledTime: newPost.scheduledTime,
+      status: 'draft',
+      platform: newPost.platform,
+      viralScore: Math.floor(Math.random() * 30) + 70
     }
 
-    if (!formData.description.trim()) {
-      toast.error("Video description is required")
-      return false
-    }
+    setPosts(prev => [...prev, post])
+    setNewPost({ title: "", caption: "", hashtags: "", scheduledTime: "18:00", platform: "tiktok" })
+    setShowCreateModal(false)
+  }
 
-    if (!formData.trend) {
-      toast.error("Please select a trend")
-      return false
-    }
-
-    // In calendar mode, we need a selected date
-    if (viewMode === 'calendar' && !selectedDate) {
-      toast.error("Please select a date on the calendar first")
-      return false
-    }
-
-    console.log('✅ Form validation passed')
-    return true
-  }, [formData, selectedDate, viewMode])
-
-  // Form handlers
-  const handleAddVideo = useCallback(() => {
-    console.log('📝 handleAddVideo called')
-
-    if (!validateForm()) {
-      console.log('❌ Form validation failed')
-      return
-    }
-
-    try {
-      const newVideo: TikTokVideo = {
-        id: crypto.randomUUID(),
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        trend: formData.trend,
-        hashtags: formData.hashtags.split(',').map(tag => tag.trim()).filter(Boolean),
-        optimalTime: formData.optimalTime,
-        scheduledDate: selectedDate || formData.scheduledDate,
-        expectedEngagement: Math.floor(Math.random() * 40) + 60,
-        status: 'draft' as const,
-        duration: 0
-      }
-
-      console.log('🎬 Creating new video:', newVideo)
-
-      setVideos(prev => [...prev, newVideo])
-      resetForm()
-      setIsDialogOpen(false)
-      toast.success("Video scheduled successfully!")
-      console.log('✅ Video added successfully')
-    } catch (error) {
-      console.error('❌ Error adding video:', error)
-      toast.error("Failed to add video. Please try again.")
-    }
-  }, [selectedDate, formData, viewMode, validateForm])
-
-  const handleEditVideo = useCallback((video: TikTokVideo) => {
-    setEditingVideo(video)
-    setFormData({
-      title: video.title,
-      description: video.description,
-      trend: video.trend,
-      hashtags: video.hashtags.join(', '),
-      optimalTime: video.optimalTime,
-      scheduledDate: video.scheduledDate
+  const handleEditPost = (post: ContentPost) => {
+    setEditingPost(post)
+    setNewPost({
+      title: post.title,
+      caption: post.caption,
+      hashtags: post.hashtags.join(', '),
+      scheduledTime: post.scheduledTime,
+      platform: post.platform
     })
-    setIsDialogOpen(true)
-  }, [])
+    setShowCreateModal(true)
+  }
 
-  const handleUpdateVideo = useCallback(() => {
-    if (!editingVideo) return
+  const handleUpdatePost = () => {
+    if (!editingPost) return
 
-    setVideos(prev => prev.map(video =>
-      video.id === editingVideo.id
+    setPosts(prev => prev.map(post =>
+      post.id === editingPost.id
         ? {
-            ...video,
-            title: formData.title,
-            description: formData.description,
-            trend: formData.trend,
-            hashtags: formData.hashtags.split(',').map(tag => tag.trim()).filter(Boolean),
-            optimalTime: formData.optimalTime,
-            scheduledDate: formData.scheduledDate
+            ...post,
+            title: newPost.title,
+            caption: newPost.caption,
+            hashtags: newPost.hashtags.split(',').map(tag => tag.trim()).filter(Boolean),
+            scheduledTime: newPost.scheduledTime,
+            platform: newPost.platform
           }
-        : video
+        : post
     ))
 
-    setEditingVideo(null)
-    resetForm()
-    setIsDialogOpen(false)
-    toast.success("Video updated successfully!")
-  }, [editingVideo, formData])
+    setEditingPost(null)
+    setNewPost({ title: "", caption: "", hashtags: "", scheduledTime: "18:00", platform: "tiktok" })
+    setShowCreateModal(false)
+  }
 
-  const handleDeleteVideo = useCallback((videoId: string) => {
-    setVideos(prev => prev.filter(video => video.id !== videoId))
-    toast.success("Video deleted successfully!")
-  }, [])
+  const handleDeletePost = (postId: string) => {
+    setPosts(prev => prev.filter(post => post.id !== postId))
+  }
 
-  const resetForm = useCallback(() => {
-    setFormData({
-      title: "",
-      description: "",
-      trend: "",
-      hashtags: "",
-      optimalTime: "6:00 PM",
-      scheduledDate: new Date()
-    })
-    setEditingVideo(null)
-  }, [])
+  const navigatePrevious = () => {
+    setSelectedDate(prev => viewMode === 'month' ? subMonths(prev, 1) : subMonths(prev, 0))
+  }
 
-  // CSV Import/Export
-  const exportToCSV = useCallback(() => {
-    const csvData = videos.map(video => ({
-      title: video.title,
-      description: video.description,
-      trend: video.trend,
-      hashtags: video.hashtags.join(';'),
-      optimalTime: video.optimalTime,
-      scheduledDate: format(video.scheduledDate, 'yyyy-MM-dd'),
-      status: video.status,
-      expectedEngagement: video.expectedEngagement
-    }))
+  const navigateNext = () => {
+    setSelectedDate(prev => viewMode === 'month' ? addMonths(prev, 1) : addMonths(prev, 0))
+  }
 
-    const csvString = [
-      Object.keys(csvData[0]).join(','),
-      ...csvData.map(row => Object.values(row).join(','))
-    ].join('\n')
-
-    const blob = new Blob([csvString], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `tiktok-calendar-${format(new Date(), 'yyyy-MM-dd')}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-    toast.success("CSV exported successfully!")
-  }, [videos])
-
-  const importFromCSV = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const csv = e.target?.result as string
-      const lines = csv.split('\n')
-      const headers = lines[0].split(',')
-
-      const importedVideos: TikTokVideo[] = lines.slice(1).map(line => {
-        const values = line.split(',')
-        return {
-          id: crypto.randomUUID(),
-          title: values[0] || '',
-          description: values[1] || '',
-          trend: values[2] || '',
-          hashtags: values[3] ? values[3].split(';') : [],
-          optimalTime: values[4] || '18:00',
-          scheduledDate: new Date(values[5] || new Date()),
-          status: (values[6] as TikTokVideo['status']) || 'draft',
-          expectedEngagement: parseInt(values[7]) || 70,
-          duration: 0
-        }
-      }).filter(video => video.title)
-
-      setVideos(prev => [...prev, ...importedVideos])
-      toast.success(`Imported ${importedVideos.length} videos from CSV!`)
-    }
-    reader.readAsText(file)
-  }, [])
-
-  const updateFormField = useCallback((field: keyof PostFormData, value: string | Date) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }, [])
-
-  const handleSubmitForm = useCallback(() => {
-    if (editingVideo) {
-      handleUpdateVideo()
-    } else {
-      handleAddVideo()
-    }
-  }, [editingVideo, handleUpdateVideo, handleAddVideo])
+  const togglePostStatus = (postId: string) => {
+    setPosts(prev => prev.map(post =>
+      post.id === postId
+        ? { ...post, status: post.status === 'scheduled' ? 'draft' : 'scheduled' }
+        : post
+    ))
+  }
 
   return (
-    <Tabs defaultValue="calendar" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="calendar">Calendar</TabsTrigger>
-        <TabsTrigger value="stats">Stats</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="calendar" className="space-y-6">
-        {/* Calendar Header with Big Add Button */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <span className="text-2xl">🗓️</span>
-              {format(currentDate, 'MMMM yyyy')}
-            </h2>
-            <p className="text-muted-foreground">
-              {currentViewVideos.length} video{currentViewVideos.length !== 1 ? 's' : ''} scheduled
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Navigation */}
-            <CalendarNavigation
-              onPrevious={navigatePrevious}
-              onNext={navigateNext}
-              onToday={navigateToday}
-            />
-
-            {/* Big Add Video Button */}
-            <Button
-              size="lg"
-              className="gap-2 px-6"
-              onClick={() => setIsDialogOpen(true)}
-            >
-              <Plus className="h-5 w-5" />
-              Add Video
-            </Button>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold flex items-center gap-3">
+            <Calendar className="h-8 w-8 text-primary" />
+            Content Calendar
+          </h2>
+          <p className="text-muted-foreground mt-1">
+            Schedule your viral content like a pro 📅
+          </p>
         </div>
-
-        {/* View Toggle & Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex gap-3">
           <div className="flex rounded-lg border">
             <Button
-              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+              variant={viewMode === 'month' ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => setViewMode('calendar')}
+              onClick={() => setViewMode('month')}
               className="rounded-r-none"
             >
-              Calendar View
+              Month
             </Button>
             <Button
-              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              variant={viewMode === 'week' ? 'default' : 'ghost'}
               size="sm"
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode('week')}
               className="rounded-l-none"
             >
-              List View
+              Week
             </Button>
           </div>
+          <Button
+            size="lg"
+            className="gap-2 px-6"
+            onClick={() => setShowCreateModal(true)}
+          >
+            <Plus className="h-5 w-5" />
+            New Post
+          </Button>
+        </div>
+      </div>
 
-          {/* Additional controls */}
-          <div className="flex gap-2 ml-auto">
-            <Button variant="outline" size="sm" onClick={exportToCSV}>
-              Export CSV
-            </Button>
-            <div>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={importFromCSV}
-                className="hidden"
-                id="csv-import"
-              />
-              <Button variant="outline" size="sm" asChild>
-                <label htmlFor="csv-import" className="cursor-pointer">
-                  Import CSV
-                </label>
+      {/* Calendar View */}
+      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl">
+              {viewMode === 'month'
+                ? format(monthStart, 'MMMM yyyy')
+                : `${format(currentViewStart, 'MMM d')} - ${format(currentViewEnd, 'MMM d, yyyy')}`
+              }
+            </CardTitle>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={navigatePrevious}>
+                ‹ Prev
+              </Button>
+              <Button variant="outline" size="sm" onClick={navigateNext}>
+                Next ›
               </Button>
             </div>
           </div>
-        </div>
+        </CardHeader>
+        <CardContent>
+          <div className={`grid gap-4 ${viewMode === 'month' ? 'grid-cols-7' : 'grid-cols-7'}`}>
+            {viewDays.map((day) => {
+              const dayPosts = postsForView.filter(post => isSameDay(post.scheduledDate, day))
+              const isSelected = isSameDay(day, selectedDate)
 
-        {/* Main content area */}
-        {viewMode === 'calendar' ? (
-          <CalendarView
-            currentDate={currentDate}
-            selectedDate={selectedDate}
-            videos={videos}
-            onDateSelect={setSelectedDate}
-            onMonthChange={setCurrentDate}
-            onEditVideo={handleEditVideo}
-            onDeleteVideo={handleDeleteVideo}
-            onAddVideo={() => setIsDialogOpen(true)}
-          />
+              return (
+                <div
+                  key={day.toISOString()}
+                  className={`${
+                    viewMode === 'month' ? 'min-h-[100px]' : 'min-h-[120px]'
+                  } p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                    isSelected
+                      ? 'border-primary bg-primary/5'
+                      : isToday(day)
+                      ? 'border-orange-300 bg-orange-50'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                  onClick={() => setSelectedDate(day)}
+                >
+                  <div className="text-sm font-medium mb-2">
+                    {format(day, 'EEE')}
+                  </div>
+                  <div className={`text-lg font-bold ${isPast(day) && !isToday(day) ? 'text-muted-foreground' : ''}`}>
+                    {format(day, 'd')}
+                  </div>
+                  <div className="mt-2 space-y-1">
+                    {dayPosts.map((post) => (
+                      <div
+                        key={post.id}
+                        className={`text-xs p-1 rounded truncate ${
+                          post.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                          post.status === 'posted' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}
+                        title={post.title}
+                      >
+                        {post.title}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Posts List */}
+      <div className="grid gap-4">
+        <h3 className="text-xl font-semibold">Scheduled Posts</h3>
+        {postsForView.length === 0 ? (
+          <Card className="border-dashed border-border/50 bg-muted/20">
+            <CardContent className="py-16 text-center">
+              <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">No posts scheduled</h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Click "New Post" to schedule your first viral content! 🚀
+              </p>
+            </CardContent>
+          </Card>
         ) : (
-          <ListView videos={currentViewVideos} />
+          postsForView
+            .sort((a: ContentPost, b: ContentPost) => a.scheduledDate.getTime() - b.scheduledDate.getTime())
+            .map((post: ContentPost) => (
+              <Card key={post.id} className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={post.thumbnail} />
+                          <AvatarFallback>
+                            {post.platform === 'tiktok' ? '🎵' :
+                             post.platform === 'instagram' ? '📸' : '🐦'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <h4 className="font-semibold text-lg">{post.title}</h4>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            {format(post.scheduledDate, 'MMM d')} at {post.scheduledTime}
+                            <Badge variant="outline" className="text-xs">
+                              {post.platform}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-muted-foreground mb-3 leading-relaxed">
+                        {post.caption}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {post.hashtags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Target className="h-4 w-4 text-orange-500" />
+                          <span className="font-medium">{post.viralScore}% viral potential</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2 ml-4">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => togglePostStatus(post.id)}
+                        className="gap-2"
+                      >
+                        {post.status === 'scheduled' ? <CheckCircle className="h-4 w-4" /> : <Circle className="h-4 w-4" />}
+                        {post.status === 'scheduled' ? 'Scheduled' : 'Draft'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEditPost(post)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeletePost(post.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
         )}
-      </TabsContent>
+      </div>
 
-      <TabsContent value="stats" className="space-y-6">
-        <CalendarAnalytics {...analyticsData} />
-      </TabsContent>
+      {/* Create/Edit Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-2xl mx-4">
+            <CardHeader>
+              <CardTitle>
+                {editingPost ? 'Edit Post' : 'Create New Post'}
+              </CardTitle>
+              <CardDescription>
+                Schedule your content for maximum viral potential 📈
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Post Title</label>
+                  <Input
+                    placeholder="e.g., Morning Dance Challenge"
+                    value={newPost.title}
+                    onChange={(e) => setNewPost(prev => ({ ...prev, title: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Platform</label>
+                  <Select
+                    value={newPost.platform}
+                    onValueChange={(value: any) => setNewPost(prev => ({ ...prev, platform: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tiktok">🎵 TikTok</SelectItem>
+                      <SelectItem value="instagram">📸 Instagram</SelectItem>
+                      <SelectItem value="twitter">🐦 Twitter</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-      {/* Hidden dialog for adding/editing videos */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>
-              {editingVideo ? 'Edit Video' : 'Add New Video'}
-            </DialogTitle>
-            <DialogDescription>
-              {editingVideo
-                ? 'Update your video details and scheduling information.'
-                : 'Upload and schedule a new TikTok video.'
-              }
-            </DialogDescription>
-          </DialogHeader>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Caption</label>
+                <Textarea
+                  placeholder="Write something that will make people stop scrolling..."
+                  rows={4}
+                  value={newPost.caption}
+                  onChange={(e) => setNewPost(prev => ({ ...prev, caption: e.target.value }))}
+                />
+              </div>
 
-          <Tabs defaultValue="details" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="upload">Upload Video</TabsTrigger>
-              <TabsTrigger value="details">Video Details</TabsTrigger>
-            </TabsList>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Hashtags</label>
+                <Input
+                  placeholder="#DanceTok #Viral #GenZ"
+                  value={newPost.hashtags}
+                  onChange={(e) => setNewPost(prev => ({ ...prev, hashtags: e.target.value }))}
+                />
+              </div>
 
-            <TabsContent value="upload" className="space-y-4">
-              <VideoUpload
-                uploadedFiles={uploadedFiles}
-                onFilesChange={setUploadedFiles}
-              />
-            </TabsContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Date</label>
+                  <Input
+                    type="date"
+                    value={format(selectedDate, 'yyyy-MM-dd')}
+                    onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Time</label>
+                  <Input
+                    type="time"
+                    value={newPost.scheduledTime}
+                    onChange={(e) => setNewPost(prev => ({ ...prev, scheduledTime: e.target.value }))}
+                  />
+                </div>
+              </div>
 
-            <TabsContent value="details" className="space-y-4">
-              <VideoForm
-                formData={formData}
-                onFormDataChange={updateFormField}
-                showDateField={viewMode === 'list'}
-              />
-            </TabsContent>
-          </Tabs>
-
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSubmitForm}>
-              {editingVideo ? 'Update Video' : 'Schedule Video'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </Tabs>
+              <div className="flex items-center gap-2 p-4 bg-primary/5 rounded-lg">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium">
+                  AI predicts {Math.floor(Math.random() * 30) + 70}% viral potential for this post! 🚀
+                </span>
+              </div>
+            </CardContent>
+            <div className="flex justify-end gap-3 p-6 pt-0">
+              <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+                Cancel
+              </Button>
+              <Button onClick={editingPost ? handleUpdatePost : handleCreatePost}>
+                {editingPost ? 'Update Post' : 'Schedule Post'}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+    </div>
   )
 }

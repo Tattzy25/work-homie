@@ -33,7 +33,7 @@ const MOCK_TRENDS = [
 ] as const
 
 const OPTIMAL_TIMES = [
-  "7:00 AM", "9:00 AM", "12:00 PM", "3:00 PM", "6:00 PM", "8:00 PM", "10:00 PM"
+  "07:00", "09:00", "12:00", "15:00", "18:00", "20:00", "22:00"
 ] as const
 
 export function VideoForm({ formData, onFormDataChange, showDateField = false }: VideoFormProps) {

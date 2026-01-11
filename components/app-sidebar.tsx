@@ -60,34 +60,34 @@ const data = {
       icon: IconChartBar,
     },
     {
-      title: "Viral Calendar",
+      title: "Content Calendar",
       url: "/viral-calendars",
       icon: IconChartBar,
     },
     {
-      title: "Embedded",
+      title: "Creator Network",
       url: "/embedded",
-      icon: IconCode,
+      icon: IconUsers,
     },
     {
-      title: "Metadata",
+      title: "Trend Oracle",
       url: "/metadata",
       icon: IconTags,
     },
     {
-      title: "Indexed",
+      title: "Video Editor Pro",
       url: "/indexed",
-      icon: IconLayout,
+      icon: IconCamera,
     },
     {
-      title: "Workflow",
+      title: "Creator Workflow",
       url: "/workflow",
       icon: IconListDetails,
     },
     {
-      title: "Showroom",
+      title: "Automation Studio",
       url: "/showroom",
-      icon: IconBuildingStore,
+      icon: IconFileAi,
     },
   ],
   navClouds: [

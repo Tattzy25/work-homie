@@ -1,3 +1,5 @@
+"use client"
+
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -6,6 +8,12 @@ import { MetricCard } from "@/components/trend-pilot/metric-card"
 import { FeatureCard } from "@/components/trend-pilot/feature-card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Switch } from "@/components/ui/switch"
 import { Progress } from "@/components/ui/progress"
 import {
   BarChart3,
@@ -21,113 +29,35 @@ import {
   Zap,
   Award,
   Globe,
-  Clock
+  Clock,
+  Star,
+  DollarSign,
+  Crown,
+  Rocket,
+  Play,
+  ExternalLink,
+  Trophy,
+  Sparkles,
+  Flame,
+  Video,
+  Music,
+  Camera,
+  Settings,
+  Plus,
+  CheckCircle,
+  AlertTriangle,
+  Bot,
+  Repeat,
+  Timer,
+  Workflow,
+  Cpu,
+  Brain,
+  Shuffle,
+  Circle,
+  Hash
 } from "lucide-react"
 
-export default function ShowroomPage() {
-  const metrics = [
-    {
-      title: "Total Views",
-      value: "2.4M",
-      description: "+12.5% from last month",
-      icon: Eye,
-      trend: "up" as const,
-      trendValue: "12.5%"
-    },
-    {
-      title: "Engagement Rate",
-      value: "8.7%",
-      description: "Above industry average",
-      icon: Heart,
-      trend: "up" as const,
-      trendValue: "2.1%"
-    },
-    {
-      title: "New Followers",
-      value: "15.2K",
-      description: "This month",
-      icon: Users,
-      trend: "up" as const,
-      trendValue: "8.3%"
-    },
-    {
-      title: "Video Completions",
-      value: "94.2%",
-      description: "Average retention",
-      icon: Target,
-      trend: "up" as const,
-      trendValue: "1.8%"
-    }
-  ]
-
-  const topPerforming = [
-    {
-      title: "Dance Challenge #Viral2026",
-      views: "892K",
-      engagement: "12.4%",
-      trend: "up" as const,
-      change: "+23%"
-    },
-    {
-      title: "Comedy Skit Compilation",
-      views: "654K",
-      engagement: "9.8%",
-      trend: "up" as const,
-      change: "+15%"
-    },
-    {
-      title: "Fashion Haul 2026",
-      views: "423K",
-      engagement: "11.2%",
-      trend: "down" as const,
-      change: "-5%"
-    }
-  ]
-
-  const audienceInsights = [
-    {
-      label: "Age 18-24",
-      percentage: 45,
-      color: "bg-blue-500"
-    },
-    {
-      label: "Age 25-34",
-      percentage: 32,
-      color: "bg-green-500"
-    },
-    {
-      label: "Age 35-44",
-      percentage: 18,
-      color: "bg-orange-500"
-    },
-    {
-      label: "Age 45+",
-      percentage: 5,
-      color: "bg-purple-500"
-    }
-  ]
-
-  const competitorAnalysis = [
-    {
-      name: "Competitor A",
-      followers: "2.1M",
-      growth: "+8.5%",
-      engagement: "7.2%"
-    },
-    {
-      name: "Competitor B",
-      followers: "1.8M",
-      growth: "+12.1%",
-      engagement: "9.1%"
-    },
-    {
-      name: "Competitor C",
-      followers: "950K",
-      growth: "+15.3%",
-      engagement: "11.5%"
-    }
-  ]
-
+export default function AutomationStudio() {
   return (
     <SidebarProvider
       style={
@@ -145,189 +75,508 @@ export default function ShowroomPage() {
             <div className="px-4 lg:px-6">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <BarChart3 className="h-6 w-6 text-primary" />
+                  <Bot className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold tracking-tight">Analytics Showroom</h1>
+                  <h1 className="text-4xl font-bold tracking-tight">Automation Studio</h1>
                   <p className="text-muted-foreground mt-1">
-                    Comprehensive TikTok analytics dashboard with competitor insights and performance tracking.
+                    AI-powered content automation for Gen Z creators. Scale your content without the burnout.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Key Metrics */}
+            {/* Automation Metrics */}
             <div className="px-4 lg:px-6">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {metrics.map((metric) => (
-                  <MetricCard
-                    key={metric.title}
-                    title={metric.title}
-                    value={metric.value}
-                    description={metric.description}
-                    icon={metric.icon}
-                    trend={metric.trend}
-                    trendValue={metric.trendValue}
-                  />
-                ))}
+                <MetricCard
+                  title="Posts Automated"
+                  value="156"
+                  description="This week"
+                  icon={Bot}
+                  trend="up"
+                  trendValue="23"
+                />
+                <MetricCard
+                  title="Time Saved"
+                  value="12.5h"
+                  description="Weekly automation"
+                  icon={Clock}
+                  trend="up"
+                  trendValue="34%"
+                />
+                <MetricCard
+                  title="Engagement Rate"
+                  value="11.2%"
+                  description="Auto-generated content"
+                  icon={Target}
+                  trend="up"
+                  trendValue="8.7%"
+                />
+                <MetricCard
+                  title="Active Workflows"
+                  value="7"
+                  description="Running automations"
+                  icon={Workflow}
+                  trend="up"
+                  trendValue="2"
+                />
               </div>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2 px-4 lg:px-6">
-              {/* Top Performing Content */}
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Award className="h-5 w-5 text-primary" />
-                    Top Performing Content
-                  </CardTitle>
-                  <CardDescription>
-                    Your highest-performing videos this month
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {topPerforming.map((video, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-muted/20 rounded-lg">
-                        <div className="space-y-1">
-                          <h3 className="font-medium">{video.title}</h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Eye className="h-3 w-3" />
-                              {video.views}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Heart className="h-3 w-3" />
-                              {video.engagement}
-                            </span>
+            {/* Main Automation Interface */}
+            <div className="px-4 lg:px-6">
+              <Tabs defaultValue="workflows" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 bg-muted/50 border">
+                  <TabsTrigger value="workflows" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm flex items-center gap-2">
+                    <Workflow className="h-4 w-4" />
+                    Workflows
+                  </TabsTrigger>
+                  <TabsTrigger value="templates" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm flex items-center gap-2">
+                    <Shuffle className="h-4 w-4" />
+                    Templates
+                  </TabsTrigger>
+                  <TabsTrigger value="scheduler" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm flex items-center gap-2">
+                    <Timer className="h-4 w-4" />
+                    Scheduler
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Analytics
+                  </TabsTrigger>
+                </TabsList>
+
+                {/* Workflows Tab */}
+                <TabsContent value="workflows" className="mt-8">
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <div className="space-y-6">
+                      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                          <CardTitle className="text-xl flex items-center gap-2">
+                            <Workflow className="h-5 w-5 text-primary" />
+                            Active Automations
+                          </CardTitle>
+                          <CardDescription>
+                            Your running content automation workflows
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          {[
+                            {
+                              name: "Trend Response Bot",
+                              description: "Creates content for trending challenges automatically",
+                              status: "active",
+                              posts: 12,
+                              engagement: "14.2%"
+                            },
+                            {
+                              name: "Caption Generator",
+                              description: "AI generates viral captions for all your posts",
+                              status: "active",
+                              posts: 8,
+                              engagement: "11.8%"
+                            },
+                            {
+                              name: "Hashtag Optimizer",
+                              description: "Finds and applies trending hashtags",
+                              status: "paused",
+                              posts: 15,
+                              engagement: "9.3%"
+                            }
+                          ].map((workflow, index) => (
+                            <div key={index} className="p-4 bg-muted/20 rounded-lg border">
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-sm">{workflow.name}</h4>
+                                <div className="flex items-center gap-2">
+                                  <Badge variant={workflow.status === 'active' ? "default" : "secondary"}>
+                                    {workflow.status}
+                                  </Badge>
+                                  <Switch checked={workflow.status === 'active'} />
+                                </div>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">{workflow.description}</p>
+                              <div className="flex items-center justify-between text-xs">
+                                <span>{workflow.posts} posts generated</span>
+                                <span className="font-medium">{workflow.engagement} avg engagement</span>
+                              </div>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <Plus className="h-4 w-4 text-primary" />
+                            Create New Workflow
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Workflow Type</label>
+                            <Select>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Choose automation type" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="trend-responder">Trend Responder</SelectItem>
+                                <SelectItem value="content-generator">Content Generator</SelectItem>
+                                <SelectItem value="caption-writer">Caption Writer</SelectItem>
+                                <SelectItem value="hashtag-finder">Hashtag Optimizer</SelectItem>
+                                <SelectItem value="scheduler">Auto Scheduler</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Workflow Name</label>
+                            <Input placeholder="e.g., Viral Dance Responder" />
+                          </div>
+                          <Button className="w-full gap-2">
+                            <Plus className="h-4 w-4" />
+                            Create Workflow
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <div className="space-y-6">
+                      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                          <CardTitle className="text-xl flex items-center gap-2">
+                            <Brain className="h-5 w-5 text-primary" />
+                            AI Content Pipeline
+                          </CardTitle>
+                          <CardDescription>
+                            Automated content creation from trend to post
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-6">
+                            {/* Pipeline Steps */}
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                  <Flame className="h-4 w-4 text-primary" />
+                                </div>
+                                <span className="text-sm font-medium">Trend Detection</span>
+                              </div>
+                              <div className="flex-1 h-px bg-border" />
+                              <CheckCircle className="h-5 w-5 text-green-500" />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                  <Brain className="h-4 w-4 text-primary" />
+                                </div>
+                                <span className="text-sm font-medium">Content Generation</span>
+                              </div>
+                              <div className="flex-1 h-px bg-border" />
+                              <CheckCircle className="h-5 w-5 text-green-500" />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                                  <Sparkles className="h-4 w-4 text-primary" />
+                                </div>
+                                <span className="text-sm font-medium">Editing & Effects</span>
+                              </div>
+                              <div className="flex-1 h-px bg-border" />
+                              <div className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                                  <Timer className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <span className="text-sm font-medium">Auto Scheduling</span>
+                              </div>
+                              <div className="flex-1 h-px bg-border" />
+                              <Circle className="h-5 w-5 text-muted-foreground" />
+                            </div>
+
+                            <div className="flex items-center gap-4">
+                              <div className="flex items-center gap-2">
+                                <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                                  <Rocket className="h-4 w-4 text-muted-foreground" />
+                                </div>
+                                <span className="text-sm font-medium">Publishing</span>
+                              </div>
+                              <div className="flex-1 h-px bg-border" />
+                              <Circle className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                        <CardHeader>
+                          <CardTitle className="text-lg">Recent Automations</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          {[
+                            { action: "Generated caption for dance video", time: "2 min ago", status: "success" },
+                            { action: "Applied trending hashtags", time: "15 min ago", status: "success" },
+                            { action: "Scheduled post for optimal time", time: "1 hour ago", status: "success" },
+                            { action: "Detected new dance trend", time: "3 hours ago", status: "success" }
+                          ].map((log, index) => (
+                            <div key={index} className="flex items-center gap-3 p-2 bg-muted/20 rounded">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm truncate">{log.action}</p>
+                                <p className="text-xs text-muted-foreground">{log.time}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Templates Tab */}
+                <TabsContent value="templates" className="mt-8">
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <FeatureCard
+                      title="Viral Dance Responder"
+                      description="Automatically creates dance content for trending challenges"
+                      icon={Video}
+                      badge="Most Popular"
+                      action={{
+                        label: "Use Template",
+                        onClick: () => console.log("Using viral dance template"),
+                        variant: "default"
+                      }}
+                    />
+                    <FeatureCard
+                      title="Comedy Caption Generator"
+                      description="AI generates hilarious captions for your comedy content"
+                      icon={Brain}
+                      badge="High Engagement"
+                      action={{
+                        label: "Use Template",
+                        onClick: () => console.log("Using comedy caption template"),
+                        variant: "outline"
+                      }}
+                    />
+                    <FeatureCard
+                      title="Fashion Trend Tracker"
+                      description="Monitors fashion trends and generates outfit ideas"
+                      icon={Sparkles}
+                      badge="Trending"
+                      action={{
+                        label: "Use Template",
+                        onClick: () => console.log("Using fashion trend template"),
+                        variant: "outline"
+                      }}
+                    />
+                    <FeatureCard
+                      title="Music Video Automator"
+                      description="Creates content around trending songs and sounds"
+                      icon={Music}
+                      badge="Viral"
+                      action={{
+                        label: "Use Template",
+                        onClick: () => console.log("Using music video template"),
+                        variant: "outline"
+                      }}
+                    />
+                    <FeatureCard
+                      title="Story Series Generator"
+                      description="Automatically creates multi-part story content"
+                      icon={Repeat}
+                      badge="New"
+                      action={{
+                        label: "Use Template",
+                        onClick: () => console.log("Using story series template"),
+                        variant: "outline"
+                      }}
+                    />
+                    <FeatureCard
+                      title="Hashtag Optimization"
+                      description="Finds and applies the most effective hashtag combinations"
+                      icon={Hash}
+                      badge="Proven"
+                      action={{
+                        label: "Use Template",
+                        onClick: () => console.log("Using hashtag optimization template"),
+                        variant: "outline"
+                      }}
+                    />
+                  </div>
+                </TabsContent>
+
+                {/* Scheduler Tab */}
+                <TabsContent value="scheduler" className="mt-8">
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                          <Timer className="h-5 w-5 text-primary" />
+                          Auto-Scheduling Rules
+                        </CardTitle>
+                        <CardDescription>
+                          Set intelligent posting schedules based on your audience
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                            <div>
+                              <p className="font-medium text-sm">Peak Engagement Hours</p>
+                              <p className="text-xs text-muted-foreground">6-8 PM based on your analytics</p>
+                            </div>
+                            <Switch defaultChecked />
+                          </div>
+
+                          <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                            <div>
+                              <p className="font-medium text-sm">Avoid Posting Conflicts</p>
+                              <p className="text-xs text-muted-foreground">Space posts 2-3 hours apart</p>
+                            </div>
+                            <Switch defaultChecked />
+                          </div>
+
+                          <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                            <div>
+                              <p className="font-medium text-sm">Weekend Boost</p>
+                              <p className="text-xs text-muted-foreground">Extra posts on weekends</p>
+                            </div>
+                            <Switch />
                           </div>
                         </div>
-                        <div className="text-right">
-                          <Badge
-                            variant={video.trend === "up" ? "default" : "secondary"}
-                            className={video.trend === "up" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
-                          >
-                            {video.change}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      </CardContent>
+                    </Card>
 
-              {/* Audience Demographics */}
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Audience Demographics
-                  </CardTitle>
-                  <CardDescription>
-                    Breakdown of your audience by age group
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {audienceInsights.map((group, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>{group.label}</span>
-                          <span className="font-medium">{group.percentage}%</span>
-                        </div>
-                        <Progress value={group.percentage} className="h-2" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 p-3 bg-primary/5 rounded-lg">
-                    <p className="text-xs text-primary">
-                      💡 <strong>Insight:</strong> Your primary audience is Gen Z (18-24), focus on trending challenges and viral content.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Competitor Analysis */}
-            <div className="px-4 lg:px-6">
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Globe className="h-5 w-5 text-primary" />
-                    Competitor Analysis
-                  </CardTitle>
-                  <CardDescription>
-                    Performance comparison with similar creators in your niche
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2 px-4 font-medium">Creator</th>
-                          <th className="text-left py-2 px-4 font-medium">Followers</th>
-                          <th className="text-left py-2 px-4 font-medium">Growth</th>
-                          <th className="text-left py-2 px-4 font-medium">Engagement</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {competitorAnalysis.map((competitor, index) => (
-                          <tr key={index} className="border-b border-border/50">
-                            <td className="py-3 px-4 font-medium">{competitor.name}</td>
-                            <td className="py-3 px-4">{competitor.followers}</td>
-                            <td className="py-3 px-4">
-                              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                                {competitor.growth}
-                              </Badge>
-                            </td>
-                            <td className="py-3 px-4">{competitor.engagement}</td>
-                          </tr>
+                    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                          <Calendar className="h-5 w-5 text-primary" />
+                          Upcoming Schedule
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {[
+                          { time: "Today 6:00 PM", content: "Dance challenge response", platform: "tiktok" },
+                          { time: "Tomorrow 7:30 PM", content: "Comedy skit", platform: "tiktok" },
+                          { time: "Friday 8:00 PM", content: "Fashion haul", platform: "instagram" },
+                          { time: "Saturday 2:00 PM", content: "Story series part 3", platform: "tiktok" }
+                        ].map((post, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarFallback>
+                                  {post.platform === 'tiktok' ? '🎵' : '📸'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="text-sm font-medium">{post.content}</p>
+                                <p className="text-xs text-muted-foreground">{post.time}</p>
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              Auto
+                            </Badge>
+                          </div>
                         ))}
-                      </tbody>
-                    </table>
+                      </CardContent>
+                    </Card>
                   </div>
-                </CardContent>
-              </Card>
-            </div>
+                </TabsContent>
 
-            {/* Advanced Features */}
-            <div className="px-4 lg:px-6">
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <FeatureCard
-                  title="Real-time Monitoring"
-                  description="Track your content performance as it happens with live analytics updates"
-                  icon={Zap}
-                  badge="Live"
-                  action={{
-                    label: "View Live Data",
-                    onClick: () => console.log("Opening live monitoring"),
-                    variant: "default"
-                  }}
-                />
-                <FeatureCard
-                  title="Custom Reports"
-                  description="Generate detailed PDF reports for client presentations and strategy planning"
-                  icon={BarChart3}
-                  badge="Professional"
-                  action={{
-                    label: "Create Report",
-                    onClick: () => console.log("Creating custom report"),
-                    variant: "outline"
-                  }}
-                />
-                <FeatureCard
-                  title="Performance Alerts"
-                  description="Get notified when your content hits milestones or needs attention"
-                  icon={TrendingUp}
-                  badge="Smart"
-                  action={{
-                    label: "Configure Alerts",
-                    onClick: () => console.log("Configuring alerts"),
-                    variant: "outline"
-                  }}
-                />
-              </div>
+                {/* Analytics Tab */}
+                <TabsContent value="analytics" className="mt-8">
+                  <div className="grid gap-6 lg:grid-cols-2">
+                    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                          <BarChart3 className="h-5 w-5 text-primary" />
+                          Automation Performance
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-6">
+                          <div className="text-center p-6 bg-primary/5 rounded-lg">
+                            <div className="text-3xl font-bold text-primary">23.5h</div>
+                            <p className="text-sm">Time Saved This Month</p>
+                            <p className="text-xs text-muted-foreground mt-1">From automated content creation</p>
+                          </div>
+
+                          <div className="grid gap-4 md:grid-cols-2">
+                            <div className="text-center p-4 bg-green-50 rounded-lg">
+                              <div className="text-2xl font-bold text-green-600">94%</div>
+                              <p className="text-xs">Automation Success Rate</p>
+                            </div>
+                            <div className="text-center p-4 bg-blue-50 rounded-lg">
+                              <div className="text-2xl font-bold text-blue-600">156</div>
+                              <p className="text-xs">Posts Generated</p>
+                            </div>
+                            <div className="text-center p-4 bg-purple-50 rounded-lg">
+                              <div className="text-2xl font-bold text-purple-600">11.2%</div>
+                              <p className="text-xs">Avg Engagement</p>
+                            </div>
+                            <div className="text-center p-4 bg-orange-50 rounded-lg">
+                              <div className="text-2xl font-bold text-orange-600">7</div>
+                              <p className="text-xs">Active Workflows</p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                      <CardHeader>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                          <TrendingUp className="h-5 w-5 text-primary" />
+                          Content Efficiency
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-3">
+                          <div className="flex justify-between text-sm">
+                            <span>Manual Creation Time</span>
+                            <span className="font-medium">45 min/post</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>Automated Creation Time</span>
+                            <span className="font-medium text-green-600">8 min/post</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span>Time Savings</span>
+                            <span className="font-medium text-green-600">82%</span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-primary/5 rounded-lg">
+                          <p className="text-sm text-center">
+                            <strong>🚀 Productivity Boost:</strong> Create 5x more content with the same effort
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <h5 className="text-sm font-medium">Top Performing Automations</h5>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Trend Responder</span>
+                              <span className="font-medium">14.2% engagement</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Caption Generator</span>
+                              <span className="font-medium">11.8% engagement</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span>Hashtag Optimizer</span>
+                              <span className="font-medium">9.3% engagement</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </div>
