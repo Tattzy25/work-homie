@@ -1,9 +1,19 @@
 import { NextRequest } from 'next/server'
-import { getAllComponents } from '../../../lib/search/components-search'
 
 export async function GET(request: NextRequest) {
   try {
-    const components = await getAllComponents()
+    // Return mock components data for now
+    const components = {
+      components: [
+        {
+          id: "button",
+          title: "Button",
+          description: "Clickable button component",
+          category: "input",
+          filePath: "/components/ui/button.tsx"
+        }
+      ]
+    }
     return Response.json(components)
   } catch (error) {
     console.error('Get components error:', error)

@@ -192,10 +192,12 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     header: "Status",
     cell: ({ row }) => (
       <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === "Done" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+        {row.original.status === "Analyzed" ? (
+          <IconCircleCheckFilled className="text-green-600" />
+        ) : row.original.status === "In Process" ? (
+          <IconLoader className="text-blue-600" />
         ) : (
-          <IconLoader />
+          <IconCircleCheckFilled className="text-orange-600" />
         )}
         {row.original.status}
       </Badge>

@@ -50,13 +50,18 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Workshop",
-      url: "/workshop",
-      icon: IconListDetails,
+      title: "Trend Pilot",
+      url: "/trend-pilot",
+      icon: IconChartBar,
     },
     {
-      title: "Testshop",
-      url: "/testshop",
+      title: "Content Analysis",
+      url: "/content-analysis",
+      icon: IconChartBar,
+    },
+    {
+      title: "Viral Calendar",
+      url: "/viral-calendars",
       icon: IconChartBar,
     },
     {
