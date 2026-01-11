@@ -1,6 +1,17 @@
 "use client"
 
 import { useState, useRef, useCallback } from "react"
+import {
+  useDebounce,
+  useThrottle,
+  useHover,
+  useKeyPress,
+  useFullscreen,
+  useMouse,
+  useScroll,
+  useInViewport,
+  useEventListener
+} from "ahooks"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
@@ -83,7 +94,30 @@ interface TextOverlay {
   style: string
 }
 
+interface UserPreferences {
+  defaultFilter: string
+  autoSave: boolean
+  keyboardShortcuts: boolean
+}
+
 export default function VideoEditorPro() {
+  // User preferences with localStorage using globalThis
+  const [userPreferences] = useState<UserPreferences>(() => {
+    if (typeof globalThis.window !== 'undefined') {
+      const saved = globalThis.localStorage.getItem('video-editor-prefs')
+      return saved ? JSON.parse(saved) : {
+        defaultFilter: 'none',
+        autoSave: true,
+        keyboardShortcuts: true
+      }
+    }
+    return {
+      defaultFilter: 'none',
+      autoSave: true,
+      keyboardShortcuts: true
+    }
+  })
+
   const [uploadedVideo, setUploadedVideo] = useState<VideoFile | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -98,7 +132,7 @@ export default function VideoEditorPro() {
     saturation: 100,
     volume: 100,
     playbackSpeed: 1,
-    filter: 'none',
+    filter: userPreferences.defaultFilter || 'none',
     textOverlays: [],
     trimStart: 0,
     trimEnd: 0
@@ -116,9 +150,51 @@ export default function VideoEditorPro() {
     score: 100
   })
 
+  const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, { wait: 300 })
+
   const videoRef = useRef<HTMLVideoElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const videoContainerRef = useRef<HTMLDivElement>(null)
+
+  // Advanced hooks usage
+  const isHovering = useHover(videoContainerRef)
+  const mouse = useMouse()
+  const scroll = useScroll()
+  const [isFullscreen, { enterFullscreen, exitFullscreen, toggleFullscreen }] = useFullscreen(videoContainerRef)
+
+  const [inViewport] = useInViewport(videoContainerRef)
+
+  // Keyboard shortcuts
+  useKeyPress('space', (event) => {
+    if (userPreferences.keyboardShortcuts) {
+      event.preventDefault()
+      togglePlayback()
+    }
+  })
+
+  useKeyPress('f', (event) => {
+    if (userPreferences.keyboardShortcuts && event.ctrlKey) {
+      event.preventDefault()
+      toggleFullscreen()
+    }
+  })
+
+  // Throttled volume updates for performance
+  const throttledVolumeUpdate = useThrottle((newVolume: number) => {
+    setVolume(newVolume)
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume
+    }
+  }, { wait: 100 })
+
+  // Auto-save edit settings
+  useEventListener('beforeunload', () => {
+    if (userPreferences.autoSave && uploadedVideo) {
+      localStorage.setItem('last-edit-session', JSON.stringify(editSettings))
+    }
+  })
 
   const handleFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -316,7 +392,7 @@ export default function VideoEditorPro() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col bg-gradient-to-br from-background via-background to-muted/20">
+        <div className="flex flex-1 flex-col bg-linear-to-br from-background via-background to-muted/20">
           <div className="@container/main flex flex-1 flex-col gap-6 py-6 md:gap-8 md:py-8">
             <div className="px-4 lg:px-6">
               <div className="flex items-center gap-3 mb-3">
@@ -384,7 +460,7 @@ export default function VideoEditorPro() {
                     </CardHeader>
                     <CardContent>
                       <div
-                        className="aspect-video bg-gradient-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/25 relative overflow-hidden"
+                        className="aspect-video bg-linear-to-br from-muted to-muted/50 rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/25 relative overflow-hidden"
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                       >
@@ -397,12 +473,18 @@ export default function VideoEditorPro() {
                               onTimeUpdate={handleTimeUpdate}
                               onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
                               style={{ filter: getFilterCSS(editSettings.filter) }}
-                            />
+                              controls={false}
+                              muted={false}
+                              preload="metadata"
+                              aria-label={`Video: ${uploadedVideo.name}`}
+                            >
+                              <track kind="captions" srcLang="en" label="English captions" />
+                            </video>
 
                             {/* Text Overlays */}
-                            {editSettings.textOverlays.map((overlay) => (
+                            {editSettings.textOverlays.map((overlay, index) => (
                               <div
-                                key={overlay.id}
+                                key={`${overlay.id}-${index}`}
                                 className="absolute text-white font-bold drop-shadow-lg cursor-move"
                                 style={{
                                   left: `${overlay.x}%`,

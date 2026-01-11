@@ -31,13 +31,13 @@ import {
 
 export function NavUser({
   user,
-}: {
+}: Readonly<{
   user: {
     name: string
     email: string
     avatar: string
   }
-}) {
+}>) {
   const { isMobile } = useSidebar()
 
   return (
@@ -84,21 +84,25 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => globalThis.location.href = '/account'}>
                 <IconUserCircle />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => globalThis.location.href = '/account/billing'}>
                 <IconCreditCard />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => alert('🔔 Notifications panel would open')}>
                 <IconNotification />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => {
+              if (confirm('🚪 Are you sure you want to log out?')) {
+                globalThis.location.href = '/auth/signin'
+              }
+            }}>
               <IconLogout />
               Log out
             </DropdownMenuItem>

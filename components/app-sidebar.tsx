@@ -145,9 +145,14 @@ const data = {
       icon: IconSettings,
     },
     {
-      title: "AI Elements",
-      url: "/aielements",
+      title: "Policies",
+      url: "/policies",
       icon: IconFileAi,
+    },
+    {
+      title: "Pricing",
+      url: "/pricing",
+      icon: IconBuildingStore,
     },
     {
       title: "Get Help",

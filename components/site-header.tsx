@@ -17,7 +17,7 @@ import {
   CommandSeparator,
   CommandShortcut,
 } from "@/components/ui/command"
-import { IconSearch, IconFile, IconHome, IconSettings, IconUser } from "@tabler/icons-react"
+import { IconSearch, IconFile, IconHome, IconSettings, IconUser, IconLogin, IconLogout } from "@tabler/icons-react"
 
 export function SiteHeader() {
   const [open, setOpen] = React.useState(false)
@@ -61,6 +61,26 @@ export function SiteHeader() {
             </InputGroup>
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => window.location.href = '/auth/signin'}
+            >
+              <IconLogin className="size-4 mr-2" />
+              Login
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                if (confirm('Are you sure you want to logout?')) {
+                  window.location.href = '/auth/signin'
+                }
+              }}
+            >
+              <IconLogout className="size-4 mr-2" />
+              Logout
+            </Button>
             <ModeToggle />
           </div>
         </div>
